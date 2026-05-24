@@ -54,4 +54,5 @@ If a file with the same `<channel-slug>_<title-slug>` already exists in either f
 - Missing transcript: skip and continue.
 - Fetch error: log and continue.
 - Shorts/clips: skip videos below `min_duration_seconds` in `sources.json`.
-- Backlog protection: process at most `max_new_per_channel` new episodes per source per run.
+- Backlog protection: process at most `max_new_per_channel` new episodes per source per run. The default is one full-length episode per channel.
+- Log commits are created only when at least one transcript lands.

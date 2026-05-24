@@ -489,7 +489,7 @@ def run(args):
     summary = "\n".join(summary_lines)
     print(summary)
 
-    if args.log:
+    if args.log and added:
         RUN_LOGS.mkdir(exist_ok=True)
         log_path = RUN_LOGS / f"{dt.datetime.now().strftime('%Y-%m-%d_%H%M%S')}.txt"
         log_path.write_text(summary + "\n", encoding="utf-8")
