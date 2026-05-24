@@ -1,0 +1,37 @@
+{
+  "recent_limit": 15,
+  "max_new_per_channel": 3,
+  "min_duration_seconds": 1200,
+  "channels": [
+    {
+      "name": "Dwarkesh Podcast",
+      "slug": "dwarkesh",
+      "channel_url": "https://www.youtube.com/@DwarkeshPatel",
+      "enabled": true
+    },
+    {
+      "name": "Acquired",
+      "slug": "acquired",
+      "channel_url": "https://www.youtube.com/@AcquiredFM",
+      "enabled": true
+    },
+    {
+      "name": "Huberman Lab",
+      "slug": "huberman-lab",
+      "channel_url": "https://www.youtube.com/@hubermanlab",
+      "enabled": true
+    },
+    {
+      "name": "Lex Fridman Podcast",
+      "slug": "lex-fridman",
+      "channel_url": "https://www.youtube.com/@lexfridman",
+      "enabled": true
+    },
+    {
+      "name": "Latent Space",
+      "slug": "latent-space",
+      "channel_url": "https://www.youtube.com/@LatentSpaceTV",
+      "enabled": true
+    }
+  ]
+}
