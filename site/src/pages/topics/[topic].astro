@@ -31,5 +31,9 @@ const labels: Record<string, string> = {
   <h1>{labels[topicName]}</h1>
   <p class="meta">{digests.length} {digests.length === 1 ? 'digest' : 'digests'}</p>
   {digests.length === 0 && <p class="empty">Nothing here yet.</p>}
-  {digests.map(d => <DigestCard digest={d} />)}
+  {digests.length > 0 && (
+    <div class="digest-grid">
+      {digests.map(d => <DigestCard digest={d} />)}
+    </div>
+  )}
 </BaseLayout>
