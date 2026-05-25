@@ -1,0 +1,16 @@
+---
+interface Props { digest: any; }
+const { digest } = Astro.props;
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+---
+<a href={`/digests/${digest.id}`} class="digest-card">
+  <div class="card-meta">
+    <span class="card-channel">{digest.data.channel}</span>
+    <span class="card-date">{fmt(digest.data.analyzed)}</span>
+  </div>
+  <h3>{digest.data.title}</h3>
+  {digest.data.guest && <p class="card-guest">with {digest.data.guest}</p>}
+  <div class="card-topics">
+    {digest.data.topics.map((t: string) => <span class="topic-tag">#{t}</span>)}
+  </div>
+</a>

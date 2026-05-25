@@ -1,0 +1,28 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DigestCard from '../components/DigestCard.astro';
+
+const all = await getCollection('digests');
+const sorted = all.sort((a, b) => b.data.analyzed.getTime() - a.data.analyzed.getTime());
+
+const now = new Date();
+const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+const today = sorted.filter(d => d.data.analyzed >= oneDayAgo);
+const earlier = sorted.filter(d => d.data.analyzed < oneDayAgo);
+---
+<BaseLayout title="Today">
+  <h1>Today</h1>
+  {today.length === 0 && (
+    <p class="empty">No new digests today. Check back tomorrow.</p>
+  )}
+  {today.map(d => <DigestCard digest={d} />)}
+
+  {earlier.length > 0 && (
+    <>
+      <h2>Earlier</h2>
+      {earlier.slice(0, 10).map(d => <DigestCard digest={d} />)}
+      <p><a href="/archive">See all →</a></p>
+    </>
+  )}
+</BaseLayout>

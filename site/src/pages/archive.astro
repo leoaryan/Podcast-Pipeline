@@ -1,0 +1,13 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DigestCard from '../components/DigestCard.astro';
+
+const all = await getCollection('digests');
+const sorted = all.sort((a, b) => b.data.analyzed.getTime() - a.data.analyzed.getTime());
+---
+<BaseLayout title="Archive">
+  <h1>Archive</h1>
+  <p class="meta">{sorted.length} digests total</p>
+  {sorted.map(d => <DigestCard digest={d} />)}
+</BaseLayout>

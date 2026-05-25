@@ -1,0 +1,40 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const all = await getCollection('digests');
+  return all.map(d => ({ params: { slug: d.id }, props: { digest: d } }));
+}
+
+const { digest } = Astro.props;
+const { Content } = await render(digest);
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+---
+<BaseLayout title={digest.data.title}>
+  <article>
+    <header class="digest-header">
+      <p class="channel">{digest.data.channel}</p>
+      <h1>{digest.data.title}</h1>
+      {digest.data.guest && <p class="guest">with {digest.data.guest}</p>}
+      <div class="meta-row">
+        <span>{fmt(digest.data.published)}</span>
+        <span>·</span>
+        <span>{digest.data.duration_minutes} min</span>
+        <span>·</span>
+        <span>analyzed {fmt(digest.data.analyzed)}</span>
+      </div>
+      <div class="topics">
+        {digest.data.topics.map((t: string) => (
+          <a href={`/topics/${t}`} class="topic-tag">#{t}</a>
+        ))}
+      </div>
+      {digest.data.source_url && (
+        <p class="source"><a href={digest.data.source_url} target="_blank" rel="noopener">Source →</a></p>
+      )}
+    </header>
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>

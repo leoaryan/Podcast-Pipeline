@@ -1,0 +1,39 @@
+---
+import '../styles/global.css';
+interface Props { title: string; }
+const { title } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title} — Aryan's Brief</title>
+</head>
+<body>
+  <header class="site-header">
+    <a href="/" class="brand">Aryan's Brief</a>
+    <nav>
+      <a href="/">Today</a>
+      <a href="/archive">Archive</a>
+      <div class="dropdown">
+        <span>Topics</span>
+        <div class="dropdown-menu">
+          <a href="/topics/ai-research">AI Research</a>
+          <a href="/topics/engineering">Engineering</a>
+          <a href="/topics/policy-society">Policy & Society</a>
+          <a href="/topics/business">Business</a>
+          <a href="/topics/science-health">Science & Health</a>
+          <a href="/topics/wildcard">Wildcard</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <main>
+    <slot />
+  </main>
+  <footer>
+    <p>Built with Podcast Pipeline</p>
+  </footer>
+</body>
+</html>

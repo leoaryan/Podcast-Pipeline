@@ -1,0 +1,35 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DigestCard from '../../components/DigestCard.astro';
+
+export async function getStaticPaths() {
+  const all = await getCollection('digests');
+  const topics = ['ai-research', 'engineering', 'policy-society', 'business', 'science-health', 'wildcard'];
+  return topics.map(topic => ({
+    params: { topic },
+    props: {
+      digests: all
+        .filter(d => d.data.topics.includes(topic as any))
+        .sort((a, b) => b.data.analyzed.getTime() - a.data.analyzed.getTime()),
+      topicName: topic,
+    },
+  }));
+}
+
+const { digests, topicName } = Astro.props;
+const labels: Record<string, string> = {
+  'ai-research': 'AI Research & Capabilities',
+  'engineering': 'Engineering & Tools',
+  'policy-society': 'Policy, Society & Risk',
+  'business': 'Business & Strategy',
+  'science-health': 'Science & Health',
+  'wildcard': 'Wildcard',
+};
+---
+<BaseLayout title={labels[topicName]}>
+  <h1>{labels[topicName]}</h1>
+  <p class="meta">{digests.length} {digests.length === 1 ? 'digest' : 'digests'}</p>
+  {digests.length === 0 && <p class="empty">Nothing here yet.</p>}
+  {digests.map(d => <DigestCard digest={d} />)}
+</BaseLayout>
