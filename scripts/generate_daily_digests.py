@@ -147,7 +147,7 @@ def get_digest(topic: str, date: str) -> str:
 
 def main():
     date = datetime.now().strftime("%Y-%m-%d")
-    base_path = os.path.join(os.path.dirname(__file__), "..", "topics")
+    base_path = os.path.join(os.path.dirname(__file__), "..", "x-digests", "topics")
 
     topics = [
         "hermes-agent-applications",

@@ -1,0 +1,79 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import fs from 'fs';
+import path from 'path';
+
+export function getStaticPaths() {
+  return [
+    { params: { topic: "hermes-agent-applications" } },
+    { params: { topic: "ai-design-creativity" } },
+    { params: { topic: "content-marketing-experiments" } },
+    { params: { topic: "niche-boring-businesses" } },
+    { params: { topic: "ai-infrastructure-energy" } },
+    { params: { topic: "open-source-ai-tools" } },
+    { params: { topic: "fc-barcelona" } }
+  ];
+}
+
+const { topic } = Astro.params;
+
+const names: Record<string, string> = {
+  "hermes-agent-applications": "Hermes Agent Applications",
+  "ai-design-creativity": "AI in Design & Creativity",
+  "content-marketing-experiments": "Content Marketing Experiments",
+  "niche-boring-businesses": "Niche & Boring Businesses",
+  "ai-infrastructure-energy": "AI Infrastructure & Energy",
+  "open-source-ai-tools": "Open Source AI Tools & Models",
+  "fc-barcelona": "FC Barcelona"
+};
+
+const name = names[topic] || topic;
+
+// Read the latest digest file
+const dir = path.join(process.cwd(), '..', 'x-digests', 'topics', topic);
+let content = '';
+let date = '';
+
+try {
+  const files = fs.readdirSync(dir).filter(f => f.endsWith('.md')).sort().reverse();
+  if (files.length > 0) {
+    date = files[0].replace('.md', '');
+    content = fs.readFileSync(path.join(dir, files[0]), 'utf-8');
+    // Remove the first line (# Title) since we show it in the header
+    content = content.replace(/^#.*\n/, '');
+  } else {
+    content = 'No digest available yet.';
+  }
+} catch (e) {
+  content = 'No digest available yet.';
+}
+---
+
+<BaseLayout title={name}>
+  <a href="/x-digest" class="back">← Back to all topics</a>
+  <h1>{name}</h1>
+  {date && <p class="date">Date: {date}</p>}
+
+  <div class="digest-content">
+    <pre>{content}</pre>
+  </div>
+</BaseLayout>
+
+<style>
+  .back {
+    display: inline-block;
+    margin-bottom: 1rem;
+  }
+  .date {
+    color: #666;
+    margin-bottom: 2rem;
+  }
+  .digest-content pre {
+    white-space: pre-wrap;
+    font-family: system-ui, sans-serif;
+    line-height: 1.7;
+    background: #f8f8f8;
+    padding: 2rem;
+    border-radius: 8px;
+  }
+</style>

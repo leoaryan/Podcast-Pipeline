@@ -1,4 +1,8 @@
-# Cron Setup for Daily X Digest
+# X Daily Digest - Cron Setup
+
+## Important: Model Requirement
+This pipeline REQUIRES the Grok model (via xai-oauth) for x_search to work.
+Other models cannot access X data. Ensure Grok is the active provider.
 
 ## 1. Make scripts executable
 ```bash
@@ -7,26 +11,26 @@ chmod +x scripts/generate_daily_digests.py
 ```
 
 ## 2. Add to crontab
-Run this command:
 ```bash
 crontab -e
 ```
 
-Add this line (runs every day at 07:00):
+Add this line (runs every day at 07:00 UTC):
 ```cron
-0 7 * * * /root/x-daily-digest/scripts/run_daily.sh >> /root/x-daily-digest/run-logs/daily.log 2>&1
+0 7 * * * cd /root/podcast-pipeline && bash scripts/run_daily.sh >> run-logs/x-digest.log 2>&1
 ```
 
-## 3. Create logs directory
+## 3. Create logs directory if needed
 ```bash
-mkdir -p /root/x-daily-digest/run-logs
+mkdir -p /root/podcast-pipeline/run-logs
 ```
 
 ## 4. Test manually first
 ```bash
-./scripts/run_daily.sh
+cd /root/podcast-pipeline && bash scripts/run_daily.sh
 ```
 
 ## Notes
-- Make sure your Git remote is set and SSH key is configured for passwordless push.
-- The script will only commit if there are actual changes.
+- Grok model is REQUIRED for x_search to function
+- If model is changed, the pipeline will break
+- The script commits and pushes automatically on changes

@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const topics = [
+  { name: "Hermes Agent Applications", slug: "hermes-agent-applications", insight: "Kanban orchestration is becoming the core workflow engine for multi-agent systems." },
+  { name: "AI in Design & Creativity", slug: "ai-design-creativity", insight: "MCP integrations and terminal workflows are removing friction for designers." },
+  { name: "Content Marketing Experiments", slug: "content-marketing-experiments", insight: "Topical maps deliver +240% traffic. Depth beats volume." },
+  { name: "Niche & Boring Businesses", slug: "niche-boring-businesses", insight: "Narrow AI agents for lead response are the highest-leverage automation." },
+  { name: "AI Infrastructure & Energy", slug: "ai-infrastructure-energy", insight: "Power access, not compute, is the new bottleneck for AI scaling." },
+  { name: "Open Source AI Tools & Models", slug: "open-source-ai-tools", insight: "Local-first tools with data ownership are gaining strong momentum." },
+  { name: "FC Barcelona", slug: "fc-barcelona", insight: "Financial constraints forcing smarter, targeted squad building." }
+];
+---
+
+<BaseLayout title="X Daily Digest">
+  <h1>X Daily Digest</h1>
+  <p class="subtitle">Daily high-signal Twitter insights across 7 topics</p>
+
+  <div class="grid">
+    {topics.map(topic => (
+      <a href={`/x-digest/${topic.slug}`} class="card">
+        <h2>{topic.name}</h2>
+        <p class="insight">{topic.insight}</p>
+        <span class="date">Latest: May 27, 2026</span>
+      </a>
+    ))}
+  </div>
+</BaseLayout>
+
+<style>
+  .subtitle {
+    color: #666;
+    margin-bottom: 2rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  .card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow 0.2s;
+  }
+  .card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .card h2 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1.25rem;
+  }
+  .insight {
+    color: #444;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+  .date {
+    font-size: 0.85rem;
+    color: #888;
+  }
+</style>
