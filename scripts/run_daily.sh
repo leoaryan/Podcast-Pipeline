@@ -10,7 +10,7 @@ echo "=== Generating daily digests ==="
 python3 scripts/generate_daily_digests.py
 
 echo "=== Committing changes ==="
-git add topics/
+git add x-digests/topics/
 git commit -m "Daily digest update - $(date +%Y-%m-%d)" || echo "No changes to commit"
 
 echo "=== Pushing to GitHub ==="
