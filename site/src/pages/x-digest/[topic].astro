@@ -27,53 +27,116 @@ const names: Record<string, string> = {
   "fc-barcelona": "FC Barcelona"
 };
 
+const colors: Record<string, string> = {
+  "hermes-agent-applications": "#6366f1",
+  "ai-design-creativity": "#ec4899",
+  "content-marketing-experiments": "#f59e0b",
+  "niche-boring-businesses": "#10b981",
+  "ai-infrastructure-energy": "#3b82f6",
+  "open-source-ai-tools": "#8b5cf6",
+  "fc-barcelona": "#ef4444"
+};
+
 const name = names[topic] || topic;
+const accent = colors[topic] || "#6366f1";
 
 // Read the latest digest file
 const dir = path.join(process.cwd(), '..', 'x-digests', 'topics', topic);
-let content = '';
+let sections: { heading: string; items: string[] }[] = [];
 let date = '';
 
 try {
   const files = fs.readdirSync(dir).filter(f => f.endsWith('.md')).sort().reverse();
   if (files.length > 0) {
     date = files[0].replace('.md', '');
-    content = fs.readFileSync(path.join(dir, files[0]), 'utf-8');
-    // Remove the first line (# Title) since we show it in the header
-    content = content.replace(/^#.*\n/, '');
-  } else {
-    content = 'No digest available yet.';
+    const raw = fs.readFileSync(path.join(dir, files[0]), 'utf-8');
+    // Parse sections from markdown
+    const sectionRegex = /## (.*?)\n((?:- .*\n?)*)/g;
+    let match;
+    while ((match = sectionRegex.exec(raw)) !== null) {
+      const items = match[2].split('\n').filter(line => line.trim().startsWith('-')).map(line => line.replace(/^- /, '').trim());
+      if (items.length > 0) {
+        sections.push({ heading: match[1], items });
+      }
+    }
   }
 } catch (e) {
-  content = 'No digest available yet.';
+  // no digest yet
 }
 ---
 
 <BaseLayout title={name}>
-  <a href="/x-digest" class="back">← Back to all topics</a>
-  <h1>{name}</h1>
-  {date && <p class="date">Date: {date}</p>}
+  <a href="/x-digest" class="back">← All topics</a>
 
-  <div class="digest-content">
-    <pre>{content}</pre>
+  <div class="topic-header" style={`border-left: 4px solid ${accent}`}>
+    <h1>{name}</h1>
+    {date && <p class="date">May 27, 2026</p>}
   </div>
+
+  {sections.length === 0 && <p class="empty">No digest available yet. Check back tomorrow.</p>}
+
+  {sections.map(section => (
+    <section class="digest-section">
+      <h2 class="section-heading" style={`color: ${accent}`}>{section.heading}</h2>
+      <ul class="digest-list">
+        {section.items.map(item => (
+          <li set:html={item} />
+        ))}
+      </ul>
+    </section>
+  ))}
 </BaseLayout>
 
 <style>
   .back {
     display: inline-block;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    color: #94a3b8;
+    text-decoration: none;
   }
-  .date {
-    color: #666;
+  .back:hover { color: #e2e8f0; }
+  .topic-header {
+    padding: 0.75rem 0 0.75rem 1.25rem;
     margin-bottom: 2rem;
   }
-  .digest-content pre {
-    white-space: pre-wrap;
-    font-family: system-ui, sans-serif;
-    line-height: 1.7;
-    background: #f8f8f8;
-    padding: 2rem;
+  .topic-header h1 {
+    margin: 0;
+    color: #f1f5f9;
+    font-size: 1.75rem;
+  }
+  .date {
+    color: #64748b;
+    margin: 0.25rem 0 0 0;
+    font-size: 0.9rem;
+  }
+  .empty {
+    color: #64748b;
+    font-style: italic;
+  }
+  .digest-section {
+    margin-bottom: 2rem;
+    background: #0f172a;
+    border: 1px solid #1e293b;
     border-radius: 8px;
+    padding: 1.5rem;
+  }
+  .section-heading {
+    margin: 0 0 1rem 0;
+    font-size: 1.15rem;
+    letter-spacing: 0.01em;
+  }
+  .digest-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .digest-list li {
+    color: #cbd5e1;
+    line-height: 1.65;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid #1e293b;
+  }
+  .digest-list li:last-child {
+    border-bottom: none;
   }
 </style>
