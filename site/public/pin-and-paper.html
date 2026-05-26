@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pin & Paper — Twitter Digest Preview</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper:    #EFE56A;
+  --paper-2:  #F5ECA0;
+  --cream:    #F8F1D6;
+  --ink:      #1F3A8A;
+  --ink-soft: #2D4FB8;
+  --black:    #0E1430;
+  --red:      #C2342B;
+  --olive:    #6B7A2E;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: "Space Grotesk", sans-serif;
+  background: #1a1a1a;
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.page {
+  max-width: 800px;
+  width: 100%;
+  background:
+    radial-gradient(120% 90% at 20% 10%, rgba(255,255,255,.18), transparent 60%),
+    radial-gradient(140% 100% at 80% 95%, rgba(0,0,0,.05), transparent 55%),
+    var(--paper);
+  position: relative;
+  overflow: hidden;
+}
+
+/* paper grain */
+.page::before {
+  content: "";
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  opacity: .35; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5  0 0 0 0 0.45  0 0 0 0 0.2  0 0 0 .25 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+.page > * { position: relative; z-index: 1; }
+
+/* Safety pin decoration */
+.pin-row {
+  display: flex; gap: 6px; justify-content: center; padding: 1.5rem 0 0.5rem;
+}
+.pin-row svg { width: 32px; height: 28px; opacity: 0.7; }
+
+/* Cover */
+.cover {
+  text-align: center; padding: 3rem 3rem 2.5rem;
+  border-bottom: 3px dashed var(--ink-soft);
+}
+.cover .date {
+  font-family: "DM Mono", monospace; font-size: 14px; letter-spacing: .15em;
+  text-transform: uppercase; color: var(--ink-soft); margin-bottom: 1rem;
+}
+.cover h1 {
+  font-family: "Caveat", cursive; font-size: 4.5rem; font-weight: 700;
+  color: var(--ink); line-height: 1.1; letter-spacing: -.01em;
+}
+.cover .subtitle {
+  font-family: "DM Mono", monospace; font-size: 16px; margin-top: 1rem;
+  color: var(--ink-soft); letter-spacing: .1em; text-transform: uppercase;
+}
+
+/* Topic sections */
+.topic {
+  padding: 2.5rem 3rem;
+  border-bottom: 2px dotted var(--ink-soft);
+  border-bottom-opacity: 0.3;
+}
+.topic:last-child { border-bottom: none; }
+
+.topic-header {
+  display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;
+}
+.topic-num {
+  font-family: "DM Mono", monospace; font-size: 13px; color: var(--red);
+  letter-spacing: .12em; text-transform: uppercase;
+  background: var(--cream); padding: 4px 12px; border-radius: 3px;
+  border: 2px solid var(--ink);
+  transform: rotate(-2deg);
+}
+.topic h2 {
+  font-family: "Caveat", cursive; font-size: 2.5rem; font-weight: 700;
+  color: var(--ink); line-height: 1.2;
+}
+
+.subsection { margin-bottom: 1.5rem; }
+.subsection h3 {
+  font-family: "DM Mono", monospace; font-size: 13px; letter-spacing: .15em;
+  text-transform: uppercase; color: var(--olive); margin-bottom: 0.75rem;
+  border-bottom: 2px solid var(--olive); display: inline-block; padding-bottom: 2px;
+}
+.subsection .item {
+  font-family: "Space Grotesk", sans-serif; font-size: 1.0rem;
+  line-height: 1.65; color: var(--black); margin-bottom: 1rem;
+  padding-left: 1.5rem; border-left: 3px solid var(--ink-soft);
+}
+.subsection .item strong { color: var(--ink); }
+.subsection .item .handle { color: var(--red); font-weight: 600; }
+.subsection .item .source-link {
+  display: inline-block; margin-top: 0.4rem;
+  font-family: "DM Mono", monospace; font-size: 11px; color: var(--ink-soft);
+  text-decoration: none; border-bottom: 1px dotted var(--ink-soft);
+}
+
+/* Hand-drawn divider */
+.stitch {
+  text-align: center; padding: 0.5rem 0; font-family: "Caveat", cursive;
+  font-size: 1.3rem; color: var(--ink-soft); opacity: 0.5;
+}
+
+/* Footer */
+.foot {
+  text-align: center; padding: 2rem 3rem 3rem;
+  font-family: "DM Mono", monospace; font-size: 13px; color: var(--ink-soft);
+  letter-spacing: .1em;
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+<div class="pin-row">
+  <svg viewBox="0 0 32 28"><rect x="6" y="3" width="3" height="18" rx="1.5" fill="var(--ink-soft)"/><rect x="5" y="8" width="5" height="3" rx="1.5" fill="var(--ink-soft)"/><path d="M14 3c0-2-2-4-4-4S6 1 6 3h8z" fill="var(--ink)"/><rect x="20" y="6" width="3" height="16" rx="1.5" fill="var(--ink-soft)"/><circle cx="21.5" cy="4" r="5" fill="var(--ink)"/></svg>
+  <svg viewBox="0 0 32 28"><rect x="10" y="4" width="3" height="17" rx="1.5" fill="var(--ink-soft)"/><path d="M9 4c0-2.5 2.5-4.5 5-4.5s5 2 5 4.5H9z" fill="var(--ink)"/><rect x="23" y="3" width="3" height="19" rx="1.5" fill="var(--ink-soft)"/><circle cx="24.5" cy="1" r="4" fill="var(--ink)"/></svg>
+</div>
+
+<div class="cover">
+  <div class="date">May 26, 2026</div>
+  <h1>Today's Twitter<br>Digest</h1>
+  <div class="subtitle">7 topics · hand-picked signal · no algorithm</div>
+</div>
+
+<div class="stitch">— ✂ —</div>
+
+<!-- Topic 1: AI in Design & Creativity -->
+<div class="topic">
+  <div class="topic-header">
+    <span class="topic-num">01</span>
+    <h2>AI in Design & Creativity</h2>
+  </div>
+
+  <div class="subsection">
+    <h3>Key Examples</h3>
+    <div class="item">
+      <span class="handle">@itsalexvacca</span> shared that their design team replaced traditional tools with <strong>Claude Code in the terminal + Figma MCP</strong>. A non-technical designer now works almost entirely from the command line. Human brings taste and direction, AI handles layout, structure, copy, and grunt work. Result: <strong>5x output, 50+ pieces shipped in one month, some reaching 90K+ impressions</strong>.
+      <a class="source-link" href="https://x.com/itsalexvacca/status/2057457399427125290" target="_blank">→ original post</a>
+    </div>
+    <div class="item">
+      <span class="handle">@designtako</span> is leading the conversation on <strong>CLAUDE.md / DESIGN.md files</strong> — a central Markdown brain that Claude reads on every run containing typography, spacing, color rules, component standards, and taste principles. They're sharing free collections of <strong>2,000+ real DESIGN.md files</strong> from top products.
+      <a class="source-link" href="https://x.com/designtako/status/2059205402202677657" target="_blank">→ original post</a>
+    </div>
+    <div class="item">
+      <span class="handle">@jacobtechtavern</span> demonstrated an <strong>agentic end-to-end pipeline</strong>: Linear ticket → Figma MCP scrapes specs/assets → implementation → flowdeck CLI screenshots for verification → PR creation with proof. Developers sometimes don't even open Xcode.
+      <a class="source-link" href="https://x.com/jacobtechtavern/status/2058145169929609508" target="_blank">→ original post</a>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>Insights</h3>
+    <div class="item">
+      The community has largely moved past dedicated "Claude Design" interfaces. <strong>Terminal-first, agentic pipelines are the new standard.</strong>
+    </div>
+    <div class="item">
+      MCPs are the breakthrough: they let Claude pull live context from Figma, Linear, and Mobbin, turning it from a generic generator into a <strong>connected agent that understands your design system</strong>.
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>Notable Opinions</h3>
+    <div class="item">
+      <span class="handle">@designtako:</span> Taste principles pulled from thousands of top-product examples, encoded into CLAUDE.md, are what separate generic AI output from production-quality design.
+    </div>
+  </div>
+</div>
+
+<div class="stitch">— ✂ —</div>
+
+<!-- Topic 2: Niche & Boring Businesses -->
+<div class="topic">
+  <div class="topic-header">
+    <span class="topic-num">02</span>
+    <h2>Niche & Boring Businesses</h2>
+  </div>
+
+  <div class="subsection">
+    <h3>Key Examples</h3>
+    <div class="item">
+      <span class="handle">@AlfieJCarter</span> broke down <strong>31 Anthropic Claude skills</strong> mapped to real small business workflows across finance, sales, HR, marketing, and reporting. Key skills: Business Pulse (dashboard), Invoice Chase (auto-follows overdue payments), Friday Brief (KPIs), Job Post Builder. They recommend starting with <strong>4–7 skills</strong> and a 15 min/day Cowork routine.
+      <a class="source-link" href="https://x.com/AlfieJCarter/status/2057848330902745536" target="_blank">→ original post</a>
+    </div>
+    <div class="item">
+      <span class="handle">@polsia</span> is shipping narrow <strong>vertical AI agents</strong> for local service businesses. ResponseIQ handles 24/7 lead response (&lt;60 sec), missed-call text-back, appointment booking. CapCall is a dedicated AI phone receptionist. FieldFlow handles back-office for trades (HVAC, roofing, plumbing). One dental practice reportedly losing <strong>$100K+/year to missed calls</strong>.
+      <a class="source-link" href="https://x.com/polsia/status/2059119330215022685" target="_blank">→ original post</a>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>Insights</h3>
+    <div class="item">
+      The highest-leverage automations for local businesses are <strong>fast lead response, missed-call handling, and appointment booking</strong>. Missed calls are "the silent killer."
+    </div>
+  </div>
+</div>
+
+<div class="stitch">— ✂ —</div>
+
+<!-- Topic 3: Hermes Agent Applications -->
+<div class="topic">
+  <div class="topic-header">
+    <span class="topic-num">03</span>
+    <h2>Hermes Agent Applications</h2>
+  </div>
+
+  <div class="subsection">
+    <h3>Key Examples</h3>
+    <div class="item">
+      Users are deploying <strong>on-chain autonomous trading agents</strong> (ARCANA on Arc testnet). They deposit testnet USDC into a vault, select a strategy, and Hermes fully manages perpetual futures positions — reading market data, updating oracles, opening/closing positions, handling stop-loss and take-profit. <strong>Three personality-based agents run simultaneously</strong>: Apollo (conservative), Atlas (balanced), Ares (aggressive).
+      <a class="source-link" href="https://x.com/arcanaweb/status/2059179802372837629" target="_blank">→ original post</a>
+    </div>
+    <div class="item">
+      One user set up a full <strong>research → draft → approval → publish pipeline</strong> running entirely inside Telegram using Qwen Coder Next inside Hermes. The agent researches, drafts X and LinkedIn posts, waits for human approval, then schedules and publishes.
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>Insights</h3>
+    <div class="item">
+      Hermes is being used as <strong>persistent infrastructure (an "operating layer")</strong> rather than a single assistant. The real value emerges when people treat it as a dispatcher between the user and multiple tools/models.
+    </div>
+  </div>
+</div>
+
+<div class="stitch">— ✂ — ✂ — ✂ —</div>
+
+<div class="foot">
+  <p>4 more topics — Open Source AI Tools, AI Infrastructure, Content Marketing, FC Barcelona — continue in the full version.</p>
+  <p style="margin-top:0.5rem">Made with ink, paper, and care. No algorithm needed.</p>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scatterbrain — Twitter Digest Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Shrikhand&family=Zilla+Slab:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --yellow: #ffe066; --blue: #a5d8ff; --pink: #ffc9c9;
+  --green: #b2f2bb; --orange: #ffcc80; --purple: #d0bfff;
+  --cream: #faf8f3; --paper: #f7f5f0; --ink: #2d2a26;
+  --ink-light: #5c5750;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Zilla Slab', serif;
+  background: var(--paper); color: var(--ink);
+  min-height: 100vh;
+}
+
+/* Paper grain overlay */
+body::before {
+  content: ''; position: fixed; top:0; left:0; width:100%; height:100%;
+  pointer-events: none; z-index: 9999; opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat; background-size: 200px 200px;
+}
+
+/* Corkboard header */
+.corkboard {
+  background: repeating-linear-gradient(0deg, #c4956a, #c4956a 2px, #d4a574 2px, #d4a574 8px);
+  padding: 1.5rem 2rem; text-align: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+}
+.corkboard h1 {
+  font-family: 'Shrikhand', cursive; font-size: 3rem;
+  color: #fff; text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+  letter-spacing: .02em;
+}
+.corkboard .date-tag {
+  display: inline-block; font-family: 'Caveat', cursive; font-size: 1.4rem;
+  background: var(--yellow); color: var(--ink); padding: 4px 18px;
+  margin-top: 0.5rem; transform: rotate(-1deg);
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.15);
+}
+
+/* Sticky note grid */
+.notes-wall {
+  max-width: 900px; margin: 2rem auto; padding: 0 1rem;
+  display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;
+}
+
+/* Individual sticky note */
+.sticky {
+  width: 380px; min-height: 280px; padding: 1.5rem 1.25rem 1rem;
+  position: relative; box-shadow: 3px 3px 8px rgba(0,0,0,0.15);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.sticky:hover { transform: rotate(0deg) scale(1.02) !important; box-shadow: 5px 5px 16px rgba(0,0,0,0.2); }
+.sticky:nth-child(1) { background: var(--yellow); transform: rotate(-1.5deg); }
+.sticky:nth-child(2) { background: var(--pink); transform: rotate(1deg); }
+.sticky:nth-child(3) { background: var(--blue); transform: rotate(-1deg); }
+.sticky:nth-child(4) { background: var(--green); transform: rotate(1.5deg); }
+.sticky:nth-child(5) { background: var(--orange); transform: rotate(-0.5deg); }
+.sticky:nth-child(6) { background: var(--purple); transform: rotate(2deg); }
+.sticky:nth-child(7) { background: var(--yellow); transform: rotate(-2deg); }
+
+/* Tape effect */
+.sticky::before {
+  content: ''; position: absolute; top: -12px; left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 50px; height: 18px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+.sticky:nth-child(odd)::before { transform: translateX(-50%) rotate(3deg); width: 55px; }
+.sticky:nth-child(3n)::before { transform: translateX(-50%) rotate(-4deg); width: 44px; }
+
+.sticky .sticky-num {
+  font-family: 'Shrikhand', cursive; font-size: 2.5rem; opacity: 0.15;
+  position: absolute; top: 0.5rem; right: 0.75rem; line-height: 1;
+}
+.sticky h2 {
+  font-family: 'Shrikhand', cursive; font-size: 1.3rem; margin-bottom: 1rem;
+  color: var(--ink); line-height: 1.2;
+}
+.sticky .bite {
+  font-family: 'Zilla Slab', serif; font-size: 0.85rem; line-height: 1.55;
+  color: var(--ink-light); margin-bottom: 0.6rem;
+}
+.sticky .bite .handle {
+  font-weight: 700; color: var(--ink); font-family: 'Caveat', cursive;
+  font-size: 1.05rem;
+}
+.sticky .bite strong { color: var(--ink); }
+.sticky .bite .src {
+  display: block; font-family: 'Caveat', cursive; font-size: 0.8rem;
+  color: var(--ink-light); margin-top: 0.2rem; opacity: 0.7;
+}
+
+/* Full-width detail note when a topic has lots of content */
+.sticky.wide { width: 780px; }
+.sticky.wide .sticky-body { column-count: 2; column-gap: 2rem; }
+
+/* Pushpin decoration */
+.pin { position: absolute; top: 8px; left: 12px; width: 14px; height: 14px; border-radius: 50%; background: #ff6b6b; box-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+.pin::after { content: ''; position: absolute; top: 2px; left: 2px; width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.6); }
+
+/* Footer note */
+.footnote {
+  text-align: center; padding: 3rem 2rem; font-family: 'Caveat', cursive;
+  font-size: 1.3rem; color: var(--ink-light);
+}
+.footnote .doodle {
+  font-size: 2rem; display: block; margin-bottom: 0.5rem;
+}
+
+@media (max-width: 820px) {
+  .sticky { width: 100%; }
+  .sticky.wide { width: 100%; }
+  .sticky.wide .sticky-body { column-count: 1; }
+}
+</style>
+</head>
+<body>
+
+<div class="corkboard">
+  <h1>Today's Twitter Digest</h1>
+  <div class="date-tag">May 26, 2026</div>
+</div>
+
+<div class="notes-wall">
+
+<!-- Topic 1: AI in Design -->
+<div class="sticky wide">
+  <div class="pin"></div>
+  <div class="sticky-num">01</div>
+  <h2>AI in Design & Creativity</h2>
+  <div class="sticky-body">
+    <div class="bite"><span class="handle">@itsalexvacca</span> — Design team ditched traditional tools for Claude Code + Figma MCP. Non-technical designer now works from terminal. Result: <strong>5x output, 50+ pieces/month, 90K+ impressions</strong>. They give away their stack for free. <span class="src">→ x.com/itsalexvacca/status/2057457399427125290</span></div>
+    <div class="bite"><span class="handle">@designtako</span> — Leading the CLAUDE.md / DESIGN.md movement: central Markdown files with typography, spacing, color rules. Sharing <strong>2,000+ real DESIGN.md files</strong> from top products. <span class="src">→ x.com/designtako/status/2059205402202677657</span></div>
+    <div class="bite"><span class="handle">@jacobtechtavern</span> — Agentic pipeline: Linear ticket → Figma MCP → implementation → CLI screenshots → PR. Developers don't open Xcode. <span class="src">→ x.com/jacobtechtavern/status/2058145169929609508</span></div>
+  </div>
+</div>
+
+<!-- Topic 2: Niche & Boring Businesses -->
+<div class="sticky">
+  <div class="pin"></div>
+  <div class="sticky-num">02</div>
+  <h2>Niche & Boring Businesses</h2>
+  <div class="bite"><span class="handle">@AlfieJCarter</span> — Broke down <strong>31 Claude skills</strong> for small business: Business Pulse, Invoice Chase, Friday Brief. Start with 4–7 skills, 15 min/day. <span class="src">→ x.com/AlfieJCarter/status/2057848330902745536</span></div>
+  <div class="bite"><span class="handle">@polsia</span> — Vertical AI agents for local trades. ResponseIQ: 24/7 lead response. CapCall: AI receptionist. <strong>$100K+/year lost to missed calls</strong> at one dental practice. <span class="src">→ x.com/polsia/status/2059119330215022685</span></div>
+</div>
+
+<!-- Topic 3: Hermes Agent Applications -->
+<div class="sticky">
+  <div class="pin"></div>
+  <div class="sticky-num">03</div>
+  <h2>Hermes Agent Applications</h2>
+  <div class="bite"><span class="handle">@arcanaweb</span> — On-chain autonomous trading with <strong>3 personality-based agents</strong> (Apollo, Atlas, Ares). Deposit USDC, pick strategy, Hermes manages positions 24/7. <span class="src">→ x.com/arcanaweb/status/2059179802372837629</span></div>
+  <div class="bite"><span class="handle">@pxlpkr</span> — Full research → draft → approval → publish pipeline running inside Telegram. Human approval gates with long-running automation.</div>
+</div>
+
+<!-- Topic 4: AI Infrastructure & Energy -->
+<div class="sticky">
+  <div class="pin"></div>
+  <div class="sticky-num">04</div>
+  <h2>AI Infrastructure & Energy</h2>
+  <div class="bite"><span class="handle">@kyleichan</span> — <strong>Bottleneck everywhere:</strong> chips, data centers, skilled labor, transformers (12–24 month lead times), interconnection queues (4–10 years). Gigawatt AI factory started today may not come online until 2030s.</div>
+  <div class="bite"><span class="handle">@PSInvestor</span> — We're in the "dial-up era" of AI. Physical buildout is a multi-year marathon, not a software sprint. Nuclear revival being driven by AI data center demand.</div>
+</div>
+
+<!-- Topic 5: Open Source AI Tools -->
+<div class="sticky">
+  <div class="pin"></div>
+  <div class="sticky-num">05</div>
+  <h2>Open Source AI Tools</h2>
+  <div class="bite"><span class="handle">@ddsyasas</span> — Built LLM Wiki: fully local tool that ingests PDFs into a cross-linked knowledge base. No cloud, no accounts, no telemetry. Emphasis on boring-but-critical UX. <span class="src">→ x.com/ddsyasas/status/2059179533119471947</span></div>
+  <div class="bite">Anthropic released <strong>open-source financial-services agent templates</strong> — shift from "can the model do this?" to "when is AI output admissible in enterprise?"</div>
+</div>
+
+<!-- Topic 6: Content Marketing -->
+<div class="sticky">
+  <div class="pin"></div>
+  <div class="sticky-num">06</div>
+  <h2>Content Marketing</h2>
+  <div class="bite"><span class="handle">@noelcetaSEO</span> — Shift from 340 scattered articles to <strong>4 focused topical maps → +240% organic traffic</strong>, 47 featured snippets. Depth beats volume.</div>
+  <div class="bite"><span class="handle">@irabukht</span> — Auto-generating SEO pages before product launch: <strong>500+ visits/day in 5 weeks</strong>. Pre-product SEO is an underrated moat.</div>
+</div>
+
+<!-- Topic 7: FC Barcelona -->
+<div class="sticky">
+  <div class="pin"></div>
+  <div class="sticky-num">07</div>
+  <h2>FC Barcelona</h2>
+  <div class="bite"><span class="handle">@DeadlineDayLive</span> — Burnley (19th, relegated) earned more TV revenue than Barcelona winning La Liga. Explains why mid-table EPL clubs outspend La Liga sides.</div>
+  <div class="bite"><span class="handle">@FootyScopeHQ</span> — Spain's national team: <strong>8 Barça players, 0 from Real Madrid</strong>. Validation of La Masia under financial constraints.</div>
+</div>
+
+</div>
+
+<div class="footnote">
+  <span class="doodle">📌 📎 ✂️</span>
+  7 topics · hand-picked signal · no algorithm · all sources on X
+</div>
+
+</body>
+</html>

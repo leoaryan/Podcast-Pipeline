@@ -1,66 +1,259 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro'
+// Pin & Paper — Full scrollable Twitter Digest
+// Replaces the card grid as the default view at /x-digest
 
-const topics = [
-  { name: "Hermes Agent Applications", slug: "hermes-agent-applications", color: "#6366f1" },
-  { name: "AI in Design & Creativity", slug: "ai-design-creativity", color: "#ec4899" },
-  { name: "Content Marketing Experiments", slug: "content-marketing-experiments", color: "#f59e0b" },
-  { name: "Niche & Boring Businesses", slug: "niche-boring-businesses", color: "#10b981" },
-  { name: "AI Infrastructure & Energy", slug: "ai-infrastructure-energy", color: "#3b82f6" },
-  { name: "Open Source AI Tools & Models", slug: "open-source-ai-tools", color: "#8b5cf6" },
-  { name: "FC Barcelona", slug: "fc-barcelona", color: "#ef4444" }
+import fs from 'fs';
+import path from 'path';
+
+const topicDefs = [
+  { slug: "ai-design-creativity", name: "AI in Design & Creativity" },
+  { slug: "niche-boring-businesses", name: "Niche & Boring Businesses" },
+  { slug: "hermes-agent-applications", name: "Hermes Agent Applications" },
+  { slug: "ai-infrastructure-energy", name: "AI Infrastructure & Energy" },
+  { slug: "open-source-ai-tools", name: "Open Source AI Tools & Models" },
+  { slug: "content-marketing-experiments", name: "Content Marketing Experiments" },
+  { slug: "fc-barcelona", name: "FC Barcelona" }
 ];
+
+// Read latest digest for each topic
+let date = '';
+const topicData: { name: string; slug: string; sections: { heading: string; items: string[] }[] }[] = [];
+
+for (const t of topicDefs) {
+  const dir = path.join(process.cwd(), '..', 'x-digests', 'topics', t.slug);
+  const sections: { heading: string; items: string[] }[] = [];
+  try {
+    const files = fs.readdirSync(dir).filter(f => f.endsWith('.md')).sort().reverse();
+    if (files.length > 0) {
+      if (!date) date = files[0].replace('.md', '');
+      const raw = fs.readFileSync(path.join(dir, files[0]), 'utf-8');
+      const sectionRegex = /## (.*?)\n((?:- .*\n?)*)/g;
+      let match;
+      while ((match = sectionRegex.exec(raw)) !== null) {
+        const items = match[2].split('\n')
+          .filter(line => line.trim().startsWith('-'))
+          .map(line => line.replace(/^- /, '').trim());
+        if (items.length > 0) sections.push({ heading: match[1], items });
+      }
+    }
+  } catch (e) { /* skip topics with no data */ }
+  if (sections.length > 0) topicData.push({ name: t.name, slug: t.slug, sections });
+}
+
+// Format date nicely
+const fmtDate = date ? new Date(date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : '';
 ---
 
-<BaseLayout title="Twitter Digest">
-  <h1>Twitter Digest</h1>
-  <p class="subtitle">Daily high-signal insights across 7 topics, sourced from Twitter</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Twitter Digest — {date || 'Today'}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper:    #EFE56A;
+  --paper-2:  #F5ECA0;
+  --cream:    #F8F1D6;
+  --ink:      #1F3A8A;
+  --ink-soft: #2D4FB8;
+  --black:    #0E1430;
+  --red:      #C2342B;
+  --olive:    #6B7A2E;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
 
-  <div class="grid">
-    {topics.map(topic => (
-      <a href={`/x-digest/${topic.slug}`} class="card">
-        <div class="card-accent" style={`background: ${topic.color}`}></div>
-        <h2>{topic.name}</h2>
-      </a>
+body {
+  font-family: "Space Grotesk", sans-serif;
+  background: #1a1a1a;
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex; justify-content: center;
+  padding: 2rem 1rem 4rem;
+}
+
+.page {
+  max-width: 820px; width: 100%;
+  background:
+    radial-gradient(120% 90% at 20% 10%, rgba(255,255,255,.22), transparent 60%),
+    radial-gradient(140% 100% at 80% 95%, rgba(0,0,0,.04), transparent 55%),
+    var(--paper);
+  position: relative; overflow: hidden; border-radius: 2px;
+}
+
+/* paper grain */
+.page::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  opacity: .35; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5  0 0 0 0 0.45  0 0 0 0 0.2  0 0 0 .25 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+.page > * { position: relative; z-index: 1; }
+
+/* Nav bar at top */
+.top-nav {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1rem 2.5rem;
+  font-family: "DM Mono", monospace; font-size: 12px;
+  letter-spacing: .12em; text-transform: uppercase;
+  border-bottom: 2px dotted var(--ink-soft);
+}
+.top-nav a {
+  color: var(--ink-soft); text-decoration: none;
+  transition: color 0.15s;
+}
+.top-nav a:hover { color: var(--ink); }
+.top-nav .brand-link { font-weight: 500; color: var(--ink); }
+
+/* Safety pins */
+.pin-row {
+  display: flex; gap: 6px; justify-content: center; padding: 1.5rem 0 0.5rem;
+}
+.pin-row svg { width: 32px; height: 28px; opacity: 0.7; }
+
+/* Cover */
+.cover {
+  text-align: center; padding: 2rem 3rem 2.5rem;
+  border-bottom: 3px dashed var(--ink-soft);
+}
+.cover .date {
+  font-family: "DM Mono", monospace; font-size: 14px; letter-spacing: .15em;
+  text-transform: uppercase; color: var(--ink-soft); margin-bottom: 1rem;
+}
+.cover h1 {
+  font-family: "Caveat", cursive; font-size: 4.5rem; font-weight: 700;
+  color: var(--ink); line-height: 1.1; letter-spacing: -.01em;
+}
+.cover .subtitle {
+  font-family: "DM Mono", monospace; font-size: 16px; margin-top: 1rem;
+  color: var(--ink-soft); letter-spacing: .1em; text-transform: uppercase;
+}
+
+/* Topic sections */
+.topic {
+  padding: 2.5rem 3rem;
+  border-bottom: 2px dotted var(--ink-soft);
+  border-bottom-opacity: 0.25;
+}
+.topic:last-of-type { border-bottom: none; }
+
+.topic-header {
+  display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;
+}
+.topic-num {
+  font-family: "DM Mono", monospace; font-size: 13px; color: var(--red);
+  letter-spacing: .12em; text-transform: uppercase;
+  background: var(--cream); padding: 4px 12px; border-radius: 3px;
+  border: 2px solid var(--ink);
+  transform: rotate(-2deg);
+  flex-shrink: 0;
+}
+.topic h2 {
+  font-family: "Caveat", cursive; font-size: 2.4rem; font-weight: 700;
+  color: var(--ink); line-height: 1.2;
+}
+
+.subsection { margin-bottom: 1.5rem; }
+.subsection:last-child { margin-bottom: 0; }
+.subsection h3 {
+  font-family: "DM Mono", monospace; font-size: 13px; letter-spacing: .15em;
+  text-transform: uppercase; color: var(--olive); margin-bottom: 0.75rem;
+  border-bottom: 2px solid var(--olive); display: inline-block; padding-bottom: 2px;
+}
+.subsection .item {
+  font-family: "Space Grotesk", sans-serif; font-size: 1.0rem;
+  line-height: 1.65; color: var(--black); margin-bottom: 1rem;
+  padding-left: 1.5rem; border-left: 3px solid var(--ink-soft);
+}
+.subsection .item:last-child { margin-bottom: 0; }
+.subsection .item strong { color: var(--ink); font-weight: 700; }
+.subsection .item em { font-style: italic; color: var(--ink-soft); }
+
+/* Handle links in items */
+.subsection .item a {
+  color: var(--red); text-decoration: none; font-weight: 600;
+  border-bottom: 1px dotted var(--red);
+}
+.subsection .item a:hover { border-bottom-style: solid; }
+
+/* Stitch divider */
+.stitch {
+  text-align: center; padding: 0.25rem 0;
+  font-family: "Caveat", cursive; font-size: 1.3rem;
+  color: var(--ink-soft); opacity: 0.5;
+}
+
+/* Footer */
+.foot {
+  text-align: center; padding: 2.5rem 3rem 3rem;
+  font-family: "DM Mono", monospace; font-size: 13px; color: var(--ink-soft);
+  letter-spacing: .1em; line-height: 1.8;
+}
+.foot a { color: var(--ink); text-decoration: none; border-bottom: 1px dotted var(--ink-soft); }
+.foot a:hover { border-bottom-style: solid; }
+
+@media (max-width: 600px) {
+  body { padding: 1rem 0.5rem 2rem; }
+  .cover { padding: 1.5rem 1.5rem 2rem; }
+  .cover h1 { font-size: 3rem; }
+  .topic { padding: 1.8rem 1.5rem; }
+  .topic h2 { font-size: 1.8rem; }
+  .topic-header { gap: 0.5rem; }
+  .top-nav { padding: 0.75rem 1.5rem; font-size: 10px; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+<div class="top-nav">
+  <a href="/" class="brand-link">← Aryan's Brief</a>
+  <a href="/x-digest/topics">View by topic →</a>
+</div>
+
+<div class="pin-row">
+  <svg viewBox="0 0 32 28"><rect x="6" y="3" width="3" height="18" rx="1.5" fill="var(--ink-soft)"/><rect x="5" y="8" width="5" height="3" rx="1.5" fill="var(--ink-soft)"/><path d="M14 3c0-2-2-4-4-4S6 1 6 3h8z" fill="var(--ink)"/><rect x="20" y="6" width="3" height="16" rx="1.5" fill="var(--ink-soft)"/><circle cx="21.5" cy="4" r="5" fill="var(--ink)"/></svg>
+  <svg viewBox="0 0 32 28"><rect x="10" y="4" width="3" height="17" rx="1.5" fill="var(--ink-soft)"/><path d="M9 4c0-2.5 2.5-4.5 5-4.5s5 2 5 4.5H9z" fill="var(--ink)"/><rect x="23" y="3" width="3" height="19" rx="1.5" fill="var(--ink-soft)"/><circle cx="24.5" cy="1" r="4" fill="var(--ink)"/></svg>
+</div>
+
+<div class="cover">
+  <div class="date">{fmtDate || date}</div>
+  <h1>Today's Twitter<br>Digest</h1>
+  <div class="subtitle">{topicData.length} topics · hand-picked signal · no algorithm</div>
+</div>
+
+<div class="stitch">— ✂ —</div>
+
+{topicData.map((t, i) => (
+  <div class="topic">
+    <div class="topic-header">
+      <span class="topic-num">{String(i + 1).padStart(2, '0')}</span>
+      <h2>{t.name}</h2>
+    </div>
+    {t.sections.filter(s => s.heading !== 'Sources').map(s => (
+      <div class="subsection">
+        <h3>{s.heading}</h3>
+        {s.items.map(item => (
+          <div class="item" set:html={item} />
+        ))}
+      </div>
     ))}
   </div>
-</BaseLayout>
+))}
 
-<style>
-  .subtitle {
-    color: #94a3b8;
-    margin: 0 0 2.5rem 0;
-    font-size: 0.95rem;
-  }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 1.25rem;
-  }
-  .card {
-    position: relative;
-    border: 1px solid #1e293b;
-    border-radius: 10px;
-    padding: 1.5rem;
-    text-decoration: none;
-    background: #0f172a;
-    transition: border-color 0.2s, transform 0.15s;
-    overflow: hidden;
-  }
-  .card:hover {
-    border-color: #334155;
-    transform: translateY(-2px);
-  }
-  .card-accent {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-  }
-  .card h2 {
-    margin: 0;
-    font-size: 1.1rem;
-    color: #e2e8f0;
-  }
-</style>
+<div class="stitch">— ✂ — ✂ — ✂ —</div>
+
+<div class="foot">
+  <p>That's all {topicData.length} topics for {fmtDate || 'today'}.</p>
+  <p style="margin-top:0.5rem">
+    <a href="/x-digest/topics">Browse by topic</a>
+    &nbsp;·&nbsp;
+    <a href="/">Back to Aryan's Brief</a>
+  </p>
+  <p style="margin-top:1rem; font-size:12px; opacity:0.6">Made with ink, paper, and care. No algorithm needed.</p>
+</div>
+
+</div>
+</body>
+</html>

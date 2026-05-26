@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro'
+
+const topics = [
+  { name: "Hermes Agent Applications", slug: "hermes-agent-applications", color: "#6366f1" },
+  { name: "AI in Design & Creativity", slug: "ai-design-creativity", color: "#ec4899" },
+  { name: "Content Marketing Experiments", slug: "content-marketing-experiments", color: "#f59e0b" },
+  { name: "Niche & Boring Businesses", slug: "niche-boring-businesses", color: "#10b981" },
+  { name: "AI Infrastructure & Energy", slug: "ai-infrastructure-energy", color: "#3b82f6" },
+  { name: "Open Source AI Tools & Models", slug: "open-source-ai-tools", color: "#8b5cf6" },
+  { name: "FC Barcelona", slug: "fc-barcelona", color: "#ef4444" }
+];
+---
+
+<BaseLayout title="Twitter Digest — By Topic">
+  <a href="/x-digest" class="back">← Read end-to-end</a>
+  <h1>Twitter Digest — By Topic</h1>
+  <p class="subtitle">Browse individual topics. Prefer scrolling? <a href="/x-digest">Read end-to-end →</a></p>
+
+  <div class="grid">
+    {topics.map(topic => (
+      <a href={`/x-digest/${topic.slug}`} class="card">
+        <div class="card-accent" style={`background: ${topic.color}`}></div>
+        <h2>{topic.name}</h2>
+      </a>
+    ))}
+  </div>
+</BaseLayout>
+
+<style>
+  .back {
+    display: inline-block; margin-bottom: 0.5rem;
+    color: #94a3b8; text-decoration: none; font-size: 0.9rem;
+  }
+  .back:hover { color: #e2e8f0; }
+  .subtitle { color: #94a3b8; margin: 0 0 2.5rem 0; font-size: 0.95rem; }
+  .subtitle a { color: #ff6b35; text-decoration: none; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.25rem;
+  }
+  .card {
+    position: relative;
+    border: 1px solid #1e293b; border-radius: 10px;
+    padding: 1.5rem; text-decoration: none;
+    background: #0f172a;
+    transition: border-color 0.2s, transform 0.15s;
+    overflow: hidden;
+  }
+  .card:hover { border-color: #334155; transform: translateY(-2px); }
+  .card-accent {
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+  .card h2 { margin: 0; font-size: 1.1rem; color: #e2e8f0; }
+</style>
