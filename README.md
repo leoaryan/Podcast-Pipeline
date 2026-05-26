@@ -96,3 +96,27 @@ If a file with the same `<channel-slug>_<title-slug>` already exists in either f
 - Backlog protection: process at most `max_new_per_channel` new episodes per source per run. The default is one full-length episode per channel.
 - Log commits are created only when at least one transcript lands.
 - Article rate limits or blocked pages, including HTTP 403 and 429, are skipped and logged without failing the run.
+
+
+---
+
+## X Daily Digest (New)
+
+Automated daily high-signal digest from X across 7 topics.
+
+### Structure
+- `x-digests/topics/` — Daily digest files (one folder per topic)
+- `scripts/generate_daily_digests.py` — Generates the digests
+- `scripts/run_daily.sh` — Runs generation + commit + push
+
+### Cron
+See `x-digests/CRON_SETUP.md` for cron setup.
+
+### Topics
+- Hermes Agent Applications
+- AI in Design & Creativity
+- Content Marketing Experiments
+- Niche & Boring Businesses
+- AI Infrastructure & Energy
+- Open Source AI Tools & Models
+- FC Barcelona
