@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-Twitter Daily Digest Generator
-Runs on VPS using Hermes + Grok with x_search
-Each digest includes named sources, deep examples, and tweet links
+Twitter Daily Digest Generator — REFERENCE TEMPLATE
+The active pipeline is now the Hermes cron job "Twitter Daily Digest" (job_id: 412c174e683d).
+This file is kept as a reference for expected output depth and format.
+DO NOT use this for production — it has hardcoded content that will go stale.
 """
 
 import os
