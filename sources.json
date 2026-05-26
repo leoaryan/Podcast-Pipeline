@@ -5,6 +5,7 @@
   "channels": [
     {
       "name": "Dwarkesh Podcast",
+      "type": "youtube",
       "slug": "dwarkesh",
       "channel_id": "UCZa18YV7qayTh-MRIrBhDpA",
       "channel_url": "https://www.youtube.com/@DwarkeshPatel",
@@ -12,6 +13,7 @@
     },
     {
       "name": "Acquired",
+      "type": "youtube",
       "slug": "acquired",
       "channel_id": "UCyFqFYfTW2VoIQKylJ04Rtw",
       "channel_url": "https://www.youtube.com/@AcquiredFM",
@@ -19,6 +21,7 @@
     },
     {
       "name": "Huberman Lab",
+      "type": "youtube",
       "slug": "huberman-lab",
       "channel_id": "UC2D2CMWXMOVWx7giW1n3LIg",
       "channel_url": "https://www.youtube.com/@hubermanlab",
@@ -26,6 +29,7 @@
     },
     {
       "name": "Lex Fridman Podcast",
+      "type": "youtube",
       "slug": "lex-fridman",
       "channel_id": "UCJIfeSCssxSC_Dhc5s7woww",
       "channel_url": "https://www.youtube.com/@lexfridman",
@@ -33,9 +37,42 @@
     },
     {
       "name": "Latent Space",
+      "type": "youtube",
       "slug": "latent-space",
       "channel_id": "UCvi5jNRoRVm436TVAXet1kQ",
       "channel_url": "https://www.youtube.com/@LatentSpaceTV",
+      "enabled": true
+    },
+    {
+      "name": "SemiAnalysis",
+      "type": "rss_article",
+      "slug": "semi-analysis",
+      "feed_url": "https://www.semianalysis.com/feed",
+      "min_word_count": 2000,
+      "max_new_per_run": 2,
+      "enabled": true
+    },
+    {
+      "name": "Matt Levine Money Stuff",
+      "type": "rss_article",
+      "slug": "matt-levine",
+      "feed_url": "https://www.bloomberg.com/opinion/authors/ARbTQlRLRjE/matthew-s-levine.rss",
+      "min_word_count": 2000,
+      "max_new_per_run": 1,
+      "enabled": true
+    },
+    {
+      "name": "Stratechery",
+      "type": "rss_article",
+      "slug": "stratechery",
+      "feed_url": "https://stratechery.com/feed/",
+      "min_word_count": 1500,
+      "max_new_per_run": 2,
+      "filter_keywords": [
+        "strategy",
+        "analysis",
+        "thompson"
+      ],
       "enabled": true
     }
   ]

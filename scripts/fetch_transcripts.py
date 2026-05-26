@@ -6,11 +6,30 @@ import json
 import re
 import subprocess
 import sys
+import urllib.error
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
+from email.utils import parsedate_to_datetime
 from pathlib import Path
+
+from bs4 import BeautifulSoup
+
+try:
+    import feedparser
+except ImportError:
+    feedparser = None
+
+try:
+    import trafilatura
+except ImportError:
+    trafilatura = None
+
+try:
+    from readability import Document
+except ImportError:
+    Document = None
 
 try:
     from youtube_transcript_api import YouTubeTranscriptApi
@@ -76,6 +95,18 @@ class Episode:
     player: dict
 
 
+@dataclass
+class Article:
+    source_name: str
+    source_slug: str
+    title: str
+    title_slug: str
+    url: str
+    published: str
+    author: str
+    summary: str
+
+
 def fetch_text(url):
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     with urllib.request.urlopen(request, timeout=60) as response:
@@ -96,6 +127,26 @@ def iso_date(value):
         return dt.datetime.fromisoformat(value.replace("Z", "+00:00")).date().isoformat()
     except ValueError:
         return value[:10]
+
+
+def yaml_escape(value):
+    return str(value or "").replace('"', "'")
+
+
+def parse_entry_date(entry):
+    for key in ("published", "updated", "created"):
+        value = entry.get(key)
+        if not value:
+            continue
+        try:
+            return parsedate_to_datetime(value).date().isoformat()
+        except (TypeError, ValueError, IndexError):
+            return iso_date(value)
+    return dt.date.today().isoformat()
+
+
+def word_count(text):
+    return len(re.findall(r"\b[\w'-]+\b", text or ""))
 
 
 def parse_timecode(value):
@@ -178,6 +229,31 @@ def rss_entries(channel_id, limit):
         yield video_id, title, published
 
 
+def article_entries(source, limit):
+    if feedparser is None:
+        raise RuntimeError("feedparser is not installed")
+    feed = feedparser.parse(source["feed_url"])
+    if feed.bozo and not feed.entries:
+        raise RuntimeError(f"could not parse feed: {feed.bozo_exception}")
+    for entry in feed.entries[:limit]:
+        title = html.unescape(" ".join((entry.get("title") or "").split()))
+        link = entry.get("link")
+        if not title or not link:
+            continue
+        summary = html_to_text(entry.get("summary") or entry.get("description") or "")
+        author = entry.get("author") or source.get("name", "")
+        yield Article(
+            source_name=source["name"],
+            source_slug=source["slug"],
+            title=title,
+            title_slug=slugify(title),
+            url=link,
+            published=parse_entry_date(entry),
+            author=html.unescape(" ".join(author.split())),
+            summary=summary,
+        )
+
+
 def load_video(channel_name, channel_slug, video_id, fallback_title, fallback_published):
     watch_html = fetch_text(f"https://www.youtube.com/watch?v={video_id}")
     player_json = extract_json_after_marker(watch_html, "ytInitialPlayerResponse")
@@ -222,8 +298,16 @@ def output_key(episode):
     return f"{episode.channel_slug}_{episode.title_slug}"
 
 
+def article_output_key(article):
+    return f"{article.source_slug}_{article.title_slug}"
+
+
 def output_path(episode):
     return INBOX / f"{iso_date(episode.published)}_{output_key(episode)}.md"
+
+
+def article_output_path(article):
+    return INBOX / f"{iso_date(article.published)}_{article_output_key(article)}.md"
 
 
 def caption_track(player):
@@ -371,8 +455,9 @@ def group_segments(segments, max_gap=2.2, max_chars=900):
 def render_markdown(episode, chapters, segments):
     lines = [
         "---",
-        f'title: "{episode.title.replace(chr(34), chr(39))}"',
-        f'channel: "{episode.channel_name.replace(chr(34), chr(39))}"',
+        f'title: "{yaml_escape(episode.title)}"',
+        f'channel: "{yaml_escape(episode.channel_name)}"',
+        "source_type: podcast",
         f"published: {iso_date(episode.published)}",
         f"source_url: {episode.url}",
         f"video_id: {episode.video_id}",
@@ -406,10 +491,109 @@ def render_markdown(episode, chapters, segments):
     return "\n".join(lines).rstrip() + "\n"
 
 
+def html_to_text(raw_html):
+    if not raw_html:
+        return ""
+    soup = BeautifulSoup(raw_html, "html.parser")
+    return html.unescape(" ".join(soup.get_text(" ", strip=True).split()))
+
+
+def readability_to_markdown(raw_html):
+    if Document is None:
+        return ""
+    try:
+        content_html = Document(raw_html).summary(html_partial=True)
+    except Exception:
+        return ""
+    soup = BeautifulSoup(content_html, "html.parser")
+    lines = []
+    for node in soup.find_all(["h1", "h2", "h3", "p", "li", "blockquote"]):
+        text = " ".join(node.get_text(" ", strip=True).split())
+        if not text:
+            continue
+        if node.name in {"h1", "h2"}:
+            lines.append(f"## {text}")
+        elif node.name == "h3":
+            lines.append(f"### {text}")
+        elif node.name == "li":
+            lines.append(f"- {text}")
+        elif node.name == "blockquote":
+            lines.append(f"> {text}")
+        else:
+            lines.append(text)
+        lines.append("")
+    return "\n".join(lines).strip()
+
+
+def extract_article_body(raw_html):
+    if trafilatura is not None:
+        extracted = trafilatura.extract(
+            raw_html,
+            output_format="markdown",
+            include_comments=False,
+            include_tables=False,
+            favor_recall=True,
+        )
+        if extracted:
+            return extracted.strip()
+    return readability_to_markdown(raw_html)
+
+
+def looks_paywalled_or_useless(body, min_word_count):
+    lower = (body or "").lower()
+    if word_count(body) < min_word_count:
+        return True
+    subscribe_hits = sum(
+        lower.count(phrase)
+        for phrase in (
+            "subscribe to continue",
+            "subscribe now",
+            "sign in to continue",
+            "create an account",
+            "already a subscriber",
+            "free preview",
+        )
+    )
+    if subscribe_hits >= 3 and word_count(body) < min_word_count * 2:
+        return True
+    return False
+
+
+def article_matches_filter(article, body_preview, keywords):
+    if not keywords:
+        return True
+    haystack = f"{article.title}\n{article.summary}\n{body_preview[:500]}".lower()
+    return any(keyword.lower() in haystack for keyword in keywords)
+
+
+def render_article_markdown(article, body):
+    return "\n".join(
+        [
+            "---",
+            f'title: "{yaml_escape(article.title)}"',
+            f'channel: "{yaml_escape(article.source_name)}"',
+            "source_type: article",
+            f"published: {iso_date(article.published)}",
+            f"source_url: {article.url}",
+            f'author: "{yaml_escape(article.author)}"',
+            "---",
+            "",
+            body.strip(),
+            "",
+        ]
+    )
+
+
 def should_skip_episode(episode, keys, min_duration_seconds):
     if episode.duration_seconds and episode.duration_seconds < min_duration_seconds:
         return f"short/clip under {min_duration_seconds // 60} minutes"
     if output_key(episode) in keys:
+        return "already present in inbox/ or digests/"
+    return None
+
+
+def should_skip_article(article, keys):
+    if article_output_key(article) in keys:
         return "already present in inbox/ or digests/"
     return None
 
@@ -443,9 +627,58 @@ def run(args):
     for source in config.get("channels", []):
         if source.get("enabled", True) is False:
             continue
+        source_type = source.get("type", "youtube")
         channel_name = source["name"]
         channel_slug = source.get("slug") or slugify(channel_name, 40)
         checked.append(channel_name)
+        if source_type == "rss_article":
+            try:
+                min_word_count = int(source.get("min_word_count", 1500))
+                max_new = int(source.get("max_new_per_run", 2))
+                keywords = source.get("filter_keywords") or []
+                added_for_source = 0
+                for article in article_entries(source, recent_limit):
+                    if added_for_source >= max_new:
+                        break
+                    try:
+                        reason = should_skip_article(article, keys)
+                        if reason:
+                            skipped.append(f"{channel_name}: {article.title} ({reason})")
+                            continue
+                        raw_html = fetch_text(article.url)
+                        body = extract_article_body(raw_html)
+                        if not body:
+                            skipped.append(f"{channel_name}: {article.title} (article extraction failed)")
+                            continue
+                        if not article_matches_filter(article, body, keywords):
+                            skipped.append(f"{channel_name}: {article.title} (keyword filter)")
+                            continue
+                        if looks_paywalled_or_useless(body, min_word_count):
+                            skipped.append(
+                                f"{channel_name}: {article.title} "
+                                f"(extracted body below {min_word_count} useful words)"
+                            )
+                            continue
+                        markdown = render_article_markdown(article, body)
+                        path = article_output_path(article)
+                        path.parent.mkdir(parents=True, exist_ok=True)
+                        path.write_text(markdown, encoding="utf-8")
+                        keys.add(article_output_key(article))
+                        written.append(path)
+                        added.append(f"{channel_name}: {article.title}")
+                        added_for_source += 1
+                    except Exception as exc:
+                        if isinstance(exc, urllib.error.HTTPError) and exc.code in {401, 403, 429}:
+                            skipped.append(f"{channel_name}: {article.title} (HTTP {exc.code})")
+                        else:
+                            errors.append(f"{channel_name}: {article.title} ({exc})")
+                        continue
+            except Exception as exc:
+                errors.append(f"{channel_name}: source check failed ({exc})")
+            continue
+        if source_type != "youtube":
+            errors.append(f"{channel_name}: unsupported source type {source_type}")
+            continue
         try:
             channel_id = resolve_channel_id(source)
             added_for_channel = 0
