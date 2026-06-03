@@ -4,6 +4,7 @@ import datetime as dt
 import html
 import json
 import re
+import ssl
 import subprocess
 import sys
 import urllib.error
@@ -20,6 +21,11 @@ try:
     import feedparser
 except ImportError:
     feedparser = None
+
+try:
+    import certifi
+except ImportError:
+    certifi = None
 
 try:
     import trafilatura
@@ -48,6 +54,12 @@ YOUTUBE_NS = {
     "media": "http://search.yahoo.com/mrss/",
     "yt": "http://www.youtube.com/xml/schemas/2015",
 }
+if certifi is not None:
+    SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
+else:
+    SSL_CONTEXT = ssl.create_default_context()
+ssl._create_default_https_context = lambda: SSL_CONTEXT
+
 TECHNICAL_TERMS = [
     "AGI",
     "AI",
@@ -109,7 +121,7 @@ class Article:
 
 def fetch_text(url):
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-    with urllib.request.urlopen(request, timeout=60) as response:
+    with urllib.request.urlopen(request, timeout=60, context=SSL_CONTEXT) as response:
         charset = response.headers.get_content_charset() or "utf-8"
         return response.read().decode(charset, errors="replace")
 
