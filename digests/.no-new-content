@@ -1,1 +1,5 @@
-No new podcast transcripts available today. All YouTube channels are blocked from this VPS IP (DigitalOcean). RSS sources (SemiAnalysis, Stratechery) already processed or below word count thresholds. Try the spoken.md hybrid approach for YouTube channels: curl spoken.md/episode search → JSON-LD metadata → X search for host/guest threads.
+No new podcast transcripts available today. All YouTube channels are blocked from this VPS IP (DigitalOcean). RSS sources (SemiAnalysis, Stratechery) already processed or below word count thresholds. 
+
+Backlog: 22 inbox transcripts remain undigested (Latent Space, Huberman Lab, Lex Fridman, Acquired) from prior runs. These are YouTube-sourced and full-length (35-52KB each) but were never processed — likely scraper succeeded before tighter IP blocks took effect, but the digest step was never run for them.
+
+Try the spoken.md hybrid approach for YouTube channels: curl spoken.md/episode search → JSON-LD metadata → X search for host/guest threads.
