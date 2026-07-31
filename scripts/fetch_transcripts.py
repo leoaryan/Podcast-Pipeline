@@ -610,14 +610,14 @@ def should_skip_article(article, keys):
     return None
 
 
-def git_commit(paths, summary, push):
+def git_commit(paths, subject, summary, push):
     if not paths:
         return False
     subprocess.run(["git", "add", *[str(path.relative_to(ROOT)) for path in paths]], cwd=ROOT, check=True)
     diff = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=ROOT)
     if diff.returncode == 0:
         return False
-    message = "Automated podcast transcript fetch\n\n" + summary
+    message = subject + "\n\n" + summary
     subprocess.run(["git", "commit", "-m", message], cwd=ROOT, check=True)
     if push:
         subprocess.run(["git", "push"], cwd=ROOT, check=True)
@@ -732,6 +732,10 @@ def run(args):
         *[f"- error {item}" for item in errors],
     ]
     summary = "\n".join(summary_lines)
+    subject = (
+        "Automated podcast transcript fetch: "
+        f"checked {len(checked)}, added {len(added)}, skipped {len(skipped)}, errors {len(errors)}"
+    )
     print(summary)
 
     if args.log and added:
@@ -741,7 +745,7 @@ def run(args):
         written.append(log_path)
 
     if args.commit or args.push:
-        committed = git_commit(written, summary, args.push)
+        committed = git_commit(written, subject, summary, args.push)
         if not committed:
             print("No git changes to commit.")
     return 0
