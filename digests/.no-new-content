@@ -1,0 +1,1 @@
+No new podcast transcripts available today. All YouTube channels are blocked from this VPS IP (DigitalOcean). RSS sources (SemiAnalysis, Stratechery) already processed or below word count thresholds. Try the spoken.md hybrid approach for YouTube channels: curl spoken.md/episode search → JSON-LD metadata → X search for host/guest threads.
