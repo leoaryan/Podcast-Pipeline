@@ -1,0 +1,40 @@
+Checked: Dwarkesh Podcast, Acquired, Huberman Lab, Lex Fridman Podcast, Latent Space, SemiAnalysis, Matt Levine Money Stuff, Stratechery
+Added: 4
+- added Acquired: The Home Depot: How America's aging houses built the best stock of the last 45 years (Audio)
+- added Huberman Lab: How Food Choices Shape Memory, Cognition & Cravings | Dr. Scott Kanoski
+- added Lex Fridman Podcast: How Sigmund Freud revolutionized psychiatry | Andrew Scull and Lex Fridman
+- added Latent Space: Post-Training Leaves Behavioral Shadows | Paper Club
+Skipped: 32
+- skipped Dwarkesh Podcast: Why divide and conquer worked for Spain — Si Sheppard (short/clip under 20 minutes)
+- skipped Dwarkesh Podcast: Why the conquistadors thought they could win — Si Sheppard (short/clip under 20 minutes)
+- skipped Dwarkesh Podcast: Why the Aztecs were doomed - Si Sheppard (short/clip under 20 minutes)
+- skipped Dwarkesh Podcast: Why the Maya were harder to conquer than the Aztecs — Si Sheppard (short/clip under 20 minutes)
+- skipped Dwarkesh Podcast: What the Aztec and Inca emperors got wrong about the Spanish — Si Sheppard (short/clip under 20 minutes)
+- skipped Dwarkesh Podcast: Why the Aztecs couldn’t adapt to the Spanish — Si Sheppard (short/clip under 20 minutes)
+- skipped Dwarkesh Podcast: Cortés fought other Spaniards while conquering the Aztecs - Si Sheppard (short/clip under 20 minutes)
+- skipped Dwarkesh Podcast: Cortés took the Aztec Empire by taking its emperor hostage - Si Sheppard (short/clip under 20 minutes)
+- skipped SemiAnalysis: xAI’s Colossus 2 – First Gigawatt Datacenter In The World, Unique RL Methodology, Capital Raise (extracted body below 2000 useful words)
+- skipped SemiAnalysis: Another Giant Leap: The Rubin CPX Specialized Accelerator & Rack (already present in inbox/ or digests/)
+- skipped SemiAnalysis: Huawei Ascend Production Ramp: Die Banks, TSMC Continued Production, HBM is The Bottleneck (already present in inbox/ or digests/)
+- skipped SemiAnalysis: Amazon’s AI Resurgence: AWS & Anthropic’s Multi-Gigawatt Trainium Expansion (already present in inbox/ or digests/)
+- skipped SemiAnalysis: H100 vs GB200 NVL72 Training Benchmarks – Power, TCO, and Reliability Analysis, Software Improvement Over Time (already present in inbox/ or digests/)
+- skipped SemiAnalysis: GPT-5 Set the Stage for Ad Monetization and the SuperApp (already present in inbox/ or digests/)
+- skipped SemiAnalysis: Scaling the Memory Wall: The Rise and Roadmap of HBM (already present in inbox/ or digests/)
+- skipped SemiAnalysis: Robotics Levels of Autonomy (already present in inbox/ or digests/)
+- skipped Matt Levine Money Stuff: Pre-IPO Perpetual Futures Swap ETF (HTTP 403)
+- skipped Matt Levine Money Stuff: ESG Gets More Illegal (HTTP 403)
+- skipped Matt Levine Money Stuff: Treasury Futures Might Switch (HTTP 403)
+- skipped Matt Levine Money Stuff: Mergers and Acqui-hires (HTTP 403)
+- skipped Matt Levine Money Stuff: Opening Private Markets to the Public (HTTP 403)
+- skipped Matt Levine Money Stuff: AI Agents Will Pay Attention (HTTP 403)
+- skipped Matt Levine Money Stuff: Is Existential Risk Securities Fraud? (HTTP 403)
+- skipped Matt Levine Money Stuff: Banks Recycle the Risk (HTTP 403)
+- skipped Stratechery: Personal Day (extracted body below 1500 useful words)
+- skipped Stratechery: 2026.41: It’s Not You, It’s Me (keyword filter)
+- skipped Stratechery: An Interview with Katie Harbath About Disrupting Politics at Facebook (keyword filter)
+- skipped Stratechery: Apple and LG, The House For Everyone Else, Agent Standards and Amazon (keyword filter)
+- skipped Stratechery: Game Decompilation, Is This Legal?, A Well-Trodden Path (extracted body below 1500 useful words)
+- skipped Stratechery: Apple and a Hacker’s Future (keyword filter)
+- skipped Stratechery: 2026.40: Dots and Question Marks (keyword filter)
+- skipped Stratechery: An Interview with Jason Del Rey About Muse, Amazon, and Walmart (extracted body below 1500 useful words)
+Errors: 0
